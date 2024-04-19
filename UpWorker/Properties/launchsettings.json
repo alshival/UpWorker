@@ -1,0 +1,10 @@
+﻿{
+    "profiles": {
+      "UpWorker (Package)": {
+        "commandName": "MsixPackage"
+      },
+      "UpWorker (Unpackaged)": {
+        "commandName": "Project"
+      }
+    }
+}
