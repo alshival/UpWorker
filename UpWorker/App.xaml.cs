@@ -5,9 +5,8 @@ using Microsoft.UI.Xaml;
 using UpWorker.Activation;
 using UpWorker.Contracts.Services;
 using UpWorker.Core.Contracts.Services;
-using UpWorker.Core.Helpers;
-using UpWorker.Core.Models;
 using UpWorker.Core.Services;
+using UpWorker.Helpers;
 using UpWorker.Models;
 using UpWorker.Notifications;
 using UpWorker.Services;
@@ -177,7 +176,7 @@ public partial class App : Application
         DataAccess.InitializeDatabase();
         //RefreshFeed();
         //SetupTimer();
-        
+
         // Retrieve the notification service
         appNotificationService = App.GetService<IAppNotificationService>();
         await App.GetService<IActivationService>().ActivateAsync(args);

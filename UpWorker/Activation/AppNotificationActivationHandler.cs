@@ -5,7 +5,6 @@ using Microsoft.Windows.AppLifecycle;
 using Microsoft.Windows.AppNotifications;
 
 using UpWorker.Contracts.Services;
-using UpWorker.ViewModels;
 
 namespace UpWorker.Activation;
 

@@ -1,8 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using UpWorker.Contracts.ViewModels;
-using UpWorker.Core.Models;
-using UpWorker.Core.Services;
+using UpWorker.Models;
+using UpWorker.Services;
 
 namespace UpWorker.ViewModels;
 

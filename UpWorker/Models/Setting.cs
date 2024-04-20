@@ -1,4 +1,4 @@
-﻿namespace UpWorker.Core.Models;
+﻿namespace UpWorker.Models;
 
 public class Setting
 {

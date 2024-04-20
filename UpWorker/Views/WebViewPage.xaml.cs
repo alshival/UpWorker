@@ -1,7 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using UpWorker.ViewModels;
-using Windows.UI.WebUI;
 
 namespace UpWorker.Views;
 
@@ -13,16 +12,16 @@ public sealed partial class WebViewPage : Page
         get;
     }
 
-public WebViewPage()
-{
-    ViewModel = App.GetService<WebViewViewModel>();
-    InitializeComponent();
-    ViewModel.WebViewService.Initialize(WebView);
-}
+    public WebViewPage()
+    {
+        ViewModel = App.GetService<WebViewViewModel>();
+        InitializeComponent();
+        ViewModel.WebViewService.Initialize(WebView);
+    }
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        
+
         // Check if a URL is passed and it's valid, else use default URL
         if (e.Parameter is Uri uri)
         {

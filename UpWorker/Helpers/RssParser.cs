@@ -1,10 +1,10 @@
 ﻿using System.Globalization;
 using System.ServiceModel.Syndication;
 using System.Xml;
-using UpWorker.Core.Models;
-using UpWorker.Core.Services;
+using UpWorker.Models;
+using UpWorker.Services;
 
-namespace UpWorker.Core.Helpers;
+namespace UpWorker.Helpers;
 
 public class RssParser
 {

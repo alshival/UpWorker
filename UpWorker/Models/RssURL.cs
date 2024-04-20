@@ -1,11 +1,10 @@
 ﻿using System.Windows.Input;
 
-namespace UpWorker.Core.Models;
+namespace UpWorker.Models;
 
 // Model for the SampleDataService. Replace with your own model.
-public class UrlEntry
+public class RssURL
 {
-
     public int Id
     {
         get; set;
@@ -17,6 +16,11 @@ public class UrlEntry
     }
 
     public string Url
+    {
+        get; set;
+    }
+
+    public bool Enabled
     {
         get; set;
     }

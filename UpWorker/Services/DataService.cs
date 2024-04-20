@@ -1,44 +1,47 @@
-﻿using System.Reflection;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using Microsoft.Data.Sqlite;
-using Newtonsoft.Json;
-using UpWorker.Core.Models;
+using UpWorker.Models;
+using Windows.Storage;
 
-namespace UpWorker.Core.Services;
-
+namespace UpWorker.Services;
 public class DataAccess
 {
-    private static readonly string executableLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
     //#####################################################################################
     // Settings Data 
     //#####################################################################################
-    private static readonly string SettingsFileName = "settings.json"; // Path to the settings file
-    private static readonly string SettingsFilePath = Path.Combine(executableLocation, SettingsFileName);
+
+    static Windows.Storage.ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
+    static Windows.Storage.StorageFolder localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
 
     public static Dictionary<string, Setting> Settings
     {
         get; private set;
-    } = new Dictionary<string, Setting>()
-    {
-        {"RefreshRate", new Setting("1", true)},
-        {"NotificationTimeFrame", new Setting("-1 hours", true)},
-        {"ClearDataTimeFrame", new Setting("-3 days", true)}
-    };
+    }
 
     public static void InitializeSettings()
     {
-        // Check if the settings file exists
-        if (File.Exists(SettingsFilePath))
+        // Default values
+        Settings = new Dictionary<string, Setting>()
         {
-            // Read the settings from file
-            var jsonSettings = File.ReadAllText(SettingsFilePath);
-            Settings = JsonConvert.DeserializeObject<Dictionary<string, Setting>>(jsonSettings);
-        }
-        else
+            {"RefreshRate", new Setting("1", true)},
+            {"NotificationTimeFrame", new Setting("-1 hours", true)},
+            {"ClearDataTimeFrame", new Setting("-3 days", true)}
+        };
+
+        // Ensure the settings are saved in local settings
+        foreach (var setting in Settings)
         {
-            // If the file does not exist, serialize and save the default settings
-            SaveSettings();
+            if (localSettings.Values[setting.Key] == null)
+            {
+                localSettings.Values[setting.Key] = setting.Value.Option;
+                // Optionally handle other aspects of the Setting object if needed, such as storing its 'IsEnabled' state
+            }
+            else
+            {
+                // Optionally update the Settings dictionary with actual stored values
+                setting.Value.Option = localSettings.Values[setting.Key].ToString();
+            }
         }
     }
 
@@ -57,22 +60,30 @@ public class DataAccess
         // Update or add the setting
         Settings[key] = setting;
 
-        // Save changes to file
-        SaveSettings();
+        // Save the changes to localSettings
+        if (localSettings.Values.ContainsKey(key))
+        {
+            // If the setting already exists, update it
+            localSettings.Values[key] = setting.Option;
+        }
+        else
+        {
+            // If the setting does not exist, create a new entry
+            localSettings.Values.Add(key, setting.Option);
+        }
+
+        // Optionally, save other aspects like IsEnabled if necessary
+        // For example, saving it as a separate key-value pair
+        localSettings.Values[key + "Enabled"] = setting.Enabled;
     }
 
-    private static void SaveSettings()
-    {
-        var jsonSettings = JsonConvert.SerializeObject(Settings, Formatting.Indented); // Use Formatting.Indented for better readability
-        File.WriteAllText(SettingsFilePath, jsonSettings);
-    }
 
     //#####################################################################################
     // SQL Data 
     //#####################################################################################
-    private static string databaseFile = "UpWorker.db"; // Path to the settings file
-    private static string databaseFilePath = Path.Combine(executableLocation, databaseFile);
-    private static string connectionstring = $"Data Source={databaseFilePath};";
+    static string dbpath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "UpWorker.db");
+    private static string connectionstring = $"Data Source={dbpath};";
+
     public static SqliteConnection GetConnection()
     {
         var conn = new SqliteConnection(connectionstring);
@@ -83,7 +94,7 @@ public class DataAccess
     public static void InitializeDatabase()
     {
         // create database if it does not exist
-        
+
         using (var conn = DataAccess.GetConnection())
         {
             conn.Open();
@@ -173,7 +184,7 @@ public class DataAccess
         {
             connection.Open();
 
-            var cmd = new SqliteCommand("SELECT Name, Url FROM RssURLs WHERE enabled = 1",connection);
+            var cmd = new SqliteCommand("SELECT Name, Url FROM RssURLs WHERE enabled = 1", connection);
 
             SqliteDataReader query = cmd.ExecuteReader();
 
@@ -218,7 +229,7 @@ public class DataAccess
                 DELETE FROM Jobs
                 WHERE posted_on < datetime('now','{timeFrame}','localtime')
                 ";
-                
+
                 cmd.ExecuteNonQuery();
             }
 
@@ -271,8 +282,8 @@ public class DataAccess
     public static List<Job> GetUnnotifiedJobs()
     {
         var jobs = new List<Job>();
-        var notificationTimeFrame =DataAccess.GetSetting("NotificationTimeFrame").Option;
-       
+        var notificationTimeFrame = DataAccess.GetSetting("NotificationTimeFrame").Option;
+
         using (var conn = DataAccess.GetConnection())
         {
             conn.Open();
@@ -316,7 +327,7 @@ public class DataAccess
 
                 jobs.Add(job);
             }
-            
+
         }
         return jobs;
     }

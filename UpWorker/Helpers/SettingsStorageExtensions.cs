@@ -1,6 +1,4 @@
-﻿using UpWorker.Core.Helpers;
-
-using Windows.Storage;
+﻿using Windows.Storage;
 using Windows.Storage.Streams;
 
 namespace UpWorker.Helpers;

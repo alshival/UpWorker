@@ -4,9 +4,9 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using UpWorker.Contracts.Services;
-using UpWorker.Core.Helpers;
-using UpWorker.Core.Models;
-using UpWorker.Core.Services;
+using UpWorker.Helpers;
+using UpWorker.Models;
+using UpWorker.Services;
 using UpWorker.ViewModels;
 
 namespace UpWorker.Views;

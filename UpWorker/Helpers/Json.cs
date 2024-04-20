@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace UpWorker.Core.Helpers;
+namespace UpWorker.Helpers;
 
 public static class Json
 {

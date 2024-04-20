@@ -2,11 +2,8 @@
 
 using UpWorker.Contracts.Services;
 using UpWorker.Core.Contracts.Services;
-using UpWorker.Core.Helpers;
 using UpWorker.Helpers;
 using UpWorker.Models;
-
-using Windows.ApplicationModel;
 using Windows.Storage;
 
 namespace UpWorker.Services;

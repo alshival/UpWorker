@@ -1,7 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using UpWorker.Contracts.Services;
-using UpWorker.Core.Models;
+using UpWorker.Models;
 using UpWorker.ViewModels;
 
 namespace UpWorker.Views;
