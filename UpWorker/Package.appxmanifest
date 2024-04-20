@@ -13,12 +13,12 @@
   <Identity
     Name="AlshivalsDataService.Upworker"
     Publisher="CN=9B3D3FD2-7D6C-411B-8758-7862960A5ABD"
-    Version="1.0.0.0" />
+    Version="1.0.4.0" />
     
   <mp:PhoneIdentity PhoneProductId="692eb5a3-14bf-43ef-8819-9797e7c948a2" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
     
   <Properties>
-    <DisplayName>Upworker</DisplayName>
+    <DisplayName>UpworkER</DisplayName>
     <PublisherDisplayName>Alshival&apos;s Data Service</PublisherDisplayName>
     <Logo>Assets\logo.png</Logo>
   </Properties>

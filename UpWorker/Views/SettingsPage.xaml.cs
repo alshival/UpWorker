@@ -1,17 +1,13 @@
-﻿using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
+﻿using System.Collections.ObjectModel;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Navigation;
+using UpWorker.Contracts.Services;
+using UpWorker.Core.Helpers;
+using UpWorker.Core.Models;
 using UpWorker.Core.Services;
 using UpWorker.ViewModels;
-using static UpWorker.Core.Services.SQLiteDataAccess;
-using System.Collections.ObjectModel;
-using UpWorker.Core.Models;
-using UpWorker.Core.Helpers;
-using UpWorker.Notifications;
-using UpWorker.Contracts.Services;
-using UpWorker.Views;
-using System.Data.SQLite;
-using Microsoft.UI.Xaml.Navigation;
 
 namespace UpWorker.Views;
 
@@ -19,7 +15,7 @@ namespace UpWorker.Views;
 public sealed partial class SettingsPage : Page
 {
     private IAppNotificationService appNotificationService;
-    public ObservableCollection<UrlEntry> UrlEntries { get; set; } = new ObservableCollection<UrlEntry>();
+    public ObservableCollection<RssURL> UrlEntries { get; set; } = new ObservableCollection<RssURL>();
     public SettingsViewModel ViewModel
     {
         get;
@@ -43,27 +39,23 @@ public sealed partial class SettingsPage : Page
         {
             try
             {
-                List<JobListing> notifydata;
-                using (var conn = SQLiteDataAccess.GetConnection())
-                {
-                    SQLiteDataAccess.InsertSearchUrl(conn, entryName, url);
-                    statusTextBlock.Text = "Entry Saved Successfully!";
-                    statusTextBlock.Foreground = new SolidColorBrush(Microsoft.UI.Colors.Green);
-                    ReloadUrls();
-                    urlInput.Text = "";
-                    entryNameInput.Text = "";
-                    await InitialFetchAndProcessRSS(url);
-
-                    notifydata = SQLiteDataAccess.GetUnnotifiedJobs(conn);
-                }
+                List<Job> notifydata;
+                DataAccess.AddRssUrl(new RssURL { Name = entryName, Url = url, Enabled = true });
+                statusTextBlock.Text = "Entry Saved Successfully!";
+                statusTextBlock.Foreground = new SolidColorBrush(Microsoft.UI.Colors.Green);
+                ReloadUrls();
+                urlInput.Text = "";
+                entryNameInput.Text = "";
+                RssParser rssParser = new RssParser();
+                await rssParser.FetchAndProcessRSS(url);
+                statusTextBlock.Text = "RSS Data Updated!";
+                statusTextBlock.Foreground = new SolidColorBrush(Microsoft.UI.Colors.Green);
+                notifydata = DataAccess.GetUnnotifiedJobs();
                 // Send a notification
                 foreach (var job in notifydata)
                 {
                     appNotificationService.Show(job.notificationPayload);
-                    using (var conn = SQLiteDataAccess.GetConnection())
-                    {
-                        SQLiteDataAccess.MarkJobAsNotified(conn, job.Title);
-                    }
+                    DataAccess.MarkJobAsNotified(job);
                 }
             }
             catch (Exception ex)
@@ -75,8 +67,6 @@ public sealed partial class SettingsPage : Page
         {
             statusTextBlock.Text = "Please fill in all fields.";
         }
-
-        ((App)Application.Current).RefreshFeed();
     }
 
     private void ReloadUrls()
@@ -87,42 +77,33 @@ public sealed partial class SettingsPage : Page
 
     private void LoadUrls()
     {
-        using (var conn = SQLiteDataAccess.GetConnection())
+        var urls = DataAccess.GetRssUrls();
+        foreach (var url in urls)
         {
-            var urls = SQLiteDataAccess.GetSearchUrls(conn);
-            foreach (var url in urls)
-            {
-                url.DeleteCommand = new RelayCommand(param => DeleteUrl((int)param));
-                UrlEntries.Add(url);
-            }
+            url.DeleteCommand = new DataAccess.RelayCommand(param => DeleteUrl((int)param));
         }
     }
 
     public async Task InitialFetchAndProcessRSS(string url)
     {
         var feed = await RssParser.FetchRssDataAsync(url);
-        using (var conn = SQLiteDataAccess.GetConnection())
+        foreach (var item in feed.Items)
         {
-            foreach (var item in feed.Items)
+            var jobListing = RssParser.FromRssItem(item);
+            if (jobListing != null)
             {
-                var jobListing = RssParser.FromRssItem(item);
-                if (jobListing != null)
-                {
-                    // SQLiteDataAccess.InsertJobListingAsNotified(conn, jobListing);
-                    SQLiteDataAccess.InsertJobListing(conn, jobListing);
-                }
+                DataAccess.InsertJobListing(jobListing);
             }
         }
     }
 
     public void DeleteUrl(int id)
     {
-        using (var conn = SQLiteDataAccess.GetConnection())
+        var item = UrlEntries.FirstOrDefault(x => x.Id == id);
+        DataAccess.DeleteRssUrl(id);
+        if (item != null)
         {
-            SQLiteDataAccess.DeleteSearchUrl(conn, id); // Implement this method
-            var item = UrlEntries.FirstOrDefault(x => x.Id == id);
-            if (item != null)
-                UrlEntries.Remove(item);
+            UrlEntries.Remove(item);
         }
         statusTextBlock.Text = "Entry Deleted Successfully!";
         statusTextBlock.Foreground = new SolidColorBrush(Microsoft.UI.Colors.Green);
@@ -133,20 +114,7 @@ public sealed partial class SettingsPage : Page
         if (refreshRateComboBox.SelectedItem is ComboBoxItem selectedRefreshRate)
         {
             var refreshRate = selectedRefreshRate.Tag.ToString();
-            using (var conn = SQLiteDataAccess.GetConnection())
-            {
-                // SQL command to update the refresh rate setting in the app_settings table
-                string sql = "UPDATE app_settings SET option = @Option WHERE setting = 'RefreshRate'";
-
-                using (var cmd = new SQLiteCommand(sql, conn))
-                {
-                    // Use parameterized queries to prevent SQL injection
-                    cmd.Parameters.AddWithValue("@Option", refreshRate);
-
-                    // Execute the command
-                    cmd.ExecuteNonQuery();
-                }
-            }
+            DataAccess.SetSetting("RefreshRate", new Setting(refreshRate, true));
             Console.WriteLine("Refresh rate setting updated to: " + refreshRate);
         }
     }
@@ -156,20 +124,7 @@ public sealed partial class SettingsPage : Page
         if (notificationTimeFrameComboBox.SelectedItem is ComboBoxItem selectedTimeFrame)
         {
             var timeFrame = selectedTimeFrame.Tag.ToString();
-            using (var conn = SQLiteDataAccess.GetConnection())
-            {
-                // SQL command to update the refresh rate setting in the app_settings table
-                string sql = "UPDATE app_settings SET option = @Option WHERE setting = 'NotificationTimeFrame'";
-
-                using (var cmd = new SQLiteCommand(sql, conn))
-                {
-                    // Use parameterized queries to prevent SQL injection
-                    cmd.Parameters.AddWithValue("@Option", timeFrame);
-
-                    // Execute the command
-                    cmd.ExecuteNonQuery();
-                }
-            }
+            DataAccess.SetSetting("NotificationTimeFrame", new Setting(timeFrame, true));
             Console.WriteLine("Refresh rate setting updated to: " + timeFrame);
         }
     }
@@ -179,32 +134,18 @@ public sealed partial class SettingsPage : Page
         if (clearDataTimeFrameComboBox.SelectedItem is ComboBoxItem selectedTimeFrame)
         {
             var timeFrame = selectedTimeFrame.Tag.ToString();
-            using (var conn = SQLiteDataAccess.GetConnection())
+
+            if (timeFrame == "None")
             {
-                string sql;
-                if (timeFrame == "None")
-                {
-                    // Disable the setting if the time frame is "None"
-                    sql = "UPDATE app_settings SET enabled = 0 WHERE setting = 'ClearDataTimeFrame'";
-                }
-                else
-                {
-                    // Update the option and enable the setting
-                    sql = "UPDATE app_settings SET option = @Option, enabled = 1 WHERE setting = 'ClearDataTimeFrame'";
-                }
-
-                using (var cmd = new SQLiteCommand(sql, conn))
-                {
-                    // Add the parameter for the option if not "None"
-                    if (timeFrame != "None")
-                    {
-                        cmd.Parameters.AddWithValue("@Option", timeFrame);
-                    }
-
-                    // Execute the command
-                    cmd.ExecuteNonQuery();
-                }
+                // Disable the setting if the time frame is "None"
+                DataAccess.SetSetting("ClearDataTimeFrame", new Setting(timeFrame, false));
             }
+            else
+            {
+                // Update the option and enable the setting
+                DataAccess.SetSetting("ClearDataTimeFrame", new Setting(timeFrame, true));
+            }
+
             Console.WriteLine("Data purge updated to: " + timeFrame);
         }
     }
@@ -213,15 +154,16 @@ public sealed partial class SettingsPage : Page
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        await InitializeSettingsAsync();
+        InitializeSettings();
     }
 
-    private async Task InitializeSettingsAsync()
+    private void InitializeSettings()
     {
         // Fetch refresh rate and notification time frame settings from the database
-        string refreshRateSetting = await SQLiteDataAccess.GetSettingValueAsync("RefreshRate");
-        string notificationTimeFrameSetting = await SQLiteDataAccess.GetSettingValueAsync("NotificationTimeFrame");
-        string deleteTimeFrameSetting = await SQLiteDataAccess.GetSettingValueAsync("ClearDataTimeFrame");
+
+        var refreshRateSetting = DataAccess.GetSetting("RefreshRate").Option;
+        var notificationTimeFrameSetting = DataAccess.GetSetting("NotificationTimeFrame").Option;
+        var deleteTimeFrameSetting = DataAccess.GetSetting("ClearDataTimeFrame").Option;
 
         // Set the ComboBoxes to reflect these settings
         SetComboBoxSelection(refreshRateComboBox, refreshRateSetting);

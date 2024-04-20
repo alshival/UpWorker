@@ -1,10 +1,7 @@
-﻿using System.Security.Cryptography.X509Certificates;
-using System.Web;
-
-namespace UpWorker.Core.Models;
+﻿namespace UpWorker.Core.Models;
 
 // Model for the SampleDataService. Replace with your own model.
-public class JobListing
+public class Job
 {
 
     private List<string> skills;
@@ -21,7 +18,7 @@ public class JobListing
 
     public string PostedOn
     {
-        get; set; 
+        get; set;
     }
 
     public List<string> Skills
@@ -59,7 +56,7 @@ public class JobListing
         get; set;
     }
 
-    public string SearchUrl
+    public string Url
     {
         get; set;
     }

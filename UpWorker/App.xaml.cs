@@ -2,14 +2,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
-
 using UpWorker.Activation;
 using UpWorker.Contracts.Services;
 using UpWorker.Core.Contracts.Services;
 using UpWorker.Core.Helpers;
 using UpWorker.Core.Models;
 using UpWorker.Core.Services;
-using UpWorker.Helpers;
 using UpWorker.Models;
 using UpWorker.Notifications;
 using UpWorker.Services;
@@ -46,7 +44,10 @@ public partial class App : Application
 
     public static WindowEx MainWindow { get; } = new MainWindow();
 
-    public static UIElement? AppTitlebar { get; set; }
+    public static UIElement? AppTitlebar
+    {
+        get; set;
+    }
 
     public App()
     {
@@ -102,18 +103,18 @@ public partial class App : Application
         UnhandledException += App_UnhandledException;
     }
 
-    private async void SetupTimer()
+    private void SetupTimer()
     {
-        var refreshRate = await GetRefreshRateAsync();
+        var refreshRate = GetRefreshRate();
         timer = new DispatcherTimer();
         timer.Interval = TimeSpan.FromMinutes(refreshRate);
         timer.Tick += Timer_Tick;
         timer.Start();
     }
 
-    private async Task<double> GetRefreshRateAsync()
+    private double GetRefreshRate()
     {
-        var settingValue = SQLiteDataAccess.GetSettingValue("RefreshRate");
+        var settingValue = DataAccess.GetSetting("RefreshRate").Option;
         if (double.TryParse(settingValue, out double minutes))
         {
             return minutes;
@@ -131,36 +132,34 @@ public partial class App : Application
         app.RestartTimer();
     }
 
-    private async void Timer_Tick(object sender, object e)
+    private void Timer_Tick(object sender, object e)
     {
         // Your recurring task code here
         Debug.WriteLine("Timer ticked at " + DateTime.Now.ToString());
-        SQLiteDataAccess.DeleteOldJobs();
+        DataAccess.DeleteOldJobs();
         RefreshFeed();
     }
     public async void RefreshFeed()
     {
         RssParser rssParser = new RssParser();
         //Refresh URLs
-        List<JobListing> notifydata;
-        using (var conn = SQLiteDataAccess.GetConnection())
+        List<Job> notifydata;
+        using (var conn = DataAccess.GetConnection())
         {
-            var refreshList = SQLiteDataAccess.GetSearchUrls(conn);
+            conn.Open();
+            var refreshList = DataAccess.GetRssUrls();
             foreach (var url in refreshList)
             {
                 await rssParser.FetchAndProcessRSS(url.Url);
             }
-
-            notifydata = SQLiteDataAccess.GetUnnotifiedJobs(conn);
+            conn.Close();
         }
+        notifydata = DataAccess.GetUnnotifiedJobs();
         // Send a notification
         foreach (var job in notifydata)
         {
             appNotificationService.Show(job.notificationPayload);
-            using (var conn = SQLiteDataAccess.GetConnection())
-            {
-                SQLiteDataAccess.MarkJobAsNotified(conn, job.Title);
-            }
+            DataAccess.MarkJobAsNotified(job);
         }
     }
 
@@ -174,10 +173,11 @@ public partial class App : Application
     {
 
         base.OnLaunched(args);
-        SQLiteDataAccess.CreateDatabase();
-        RefreshFeed();
-        SetupTimer();
-        // App.GetService<IAppNotificationService>().Show(string.Format("AppNotificationSamplePayload".GetLocalized(), AppContext.BaseDirectory));
+        DataAccess.InitializeSettings();
+        DataAccess.InitializeDatabase();
+        //RefreshFeed();
+        //SetupTimer();
+        
         // Retrieve the notification service
         appNotificationService = App.GetService<IAppNotificationService>();
         await App.GetService<IActivationService>().ActivateAsync(args);

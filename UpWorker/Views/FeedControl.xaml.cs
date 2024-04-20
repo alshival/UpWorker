@@ -8,13 +8,13 @@ namespace UpWorker.Views;
 
 public sealed partial class FeedControl : UserControl
 {
-    public JobListing? FeedItem
+    public Job? FeedItem
     {
-        get => GetValue(FeedItemProperty) as JobListing;
+        get => GetValue(FeedItemProperty) as Job;
         set => SetValue(FeedItemProperty, value);
     }
 
-    public static readonly DependencyProperty FeedItemProperty = DependencyProperty.Register("FeedItem", typeof(JobListing), typeof(FeedControl), new PropertyMetadata(null, OnFeedItemPropertyChanged));
+    public static readonly DependencyProperty FeedItemProperty = DependencyProperty.Register("FeedItem", typeof(Job), typeof(FeedControl), new PropertyMetadata(null, OnFeedItemPropertyChanged));
 
     public FeedControl()
     {

@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Net.Http;
+﻿using System.Globalization;
 using System.ServiceModel.Syndication;
-using System.Threading.Tasks;
 using System.Xml;
 using UpWorker.Core.Models;
 using UpWorker.Core.Services;
@@ -35,12 +30,12 @@ public class RssParser
         }
     }
 
-    public static JobListing FromRssItem(SyndicationItem item)
+    public static Job FromRssItem(SyndicationItem item)
     {
         // Correctly extracting the first link as a string
         var link = item.Links.FirstOrDefault()?.Uri.ToString() ?? "";
         var description = item.Summary?.Text ?? "";
-        
+
         var category = ExtractField(description, "<b>Category</b>:");
         var skills = description.Split("<b>Skills</b>:")
                                 .Skip(1)
@@ -71,7 +66,7 @@ public class RssParser
             formattedPostedOn = postedOnDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
         }
 
-            return new JobListing
+        return new Job
         {
             Title = item.Title.Text ?? "",
             Category = category,
@@ -112,16 +107,13 @@ public class RssParser
     public async Task FetchAndProcessRSS(string url)
     {
         var feed = await RssParser.FetchRssDataAsync(url);
-        using (var conn = SQLiteDataAccess.GetConnection())
+        foreach (var item in feed.Items)
         {
-            foreach (var item in feed.Items)
+            var jobListing = RssParser.FromRssItem(item);
+            if (jobListing != null)
             {
-                var jobListing = RssParser.FromRssItem(item);
-                if (jobListing != null)
-                {
-                    jobListing.SearchUrl = url;
-                    SQLiteDataAccess.InsertJobListing(conn, jobListing);
-                }
+                jobListing.Url = url;
+                DataAccess.InsertJobListing(jobListing);
             }
         }
     }

@@ -1,20 +1,5 @@
 ﻿using UpWorker.Helpers;
 using Windows.UI.ViewManagement;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml;
-using System.Collections.ObjectModel;
-using UpWorker.Core.Services;
-using System.Security.Policy;
-using UpWorker.Core.Helpers;
-using System.Diagnostics;
-using UpWorker.Contracts.Services;
-using UpWorker.Core.Models;
-using Microsoft.UI.Xaml.Controls;
-using UpWorker.Views;
-using UpWorker.Services;
-using Microsoft.Xaml.Interactions.Core;
-using System.Data.SqlTypes;
-using UpWorker.ViewModels;
 
 namespace UpWorker;
 
@@ -36,7 +21,7 @@ public sealed partial class MainWindow : WindowEx
         dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
         settings = new UISettings();
         settings.ColorValuesChanged += Settings_ColorValuesChanged; // cannot use FrameworkElement.ActualThemeChanged event
-        
+
     }
 
 

@@ -1,39 +1,38 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using UpWorker.Contracts.ViewModels;
-using UpWorker.Core.Contracts.Services;
 using UpWorker.Core.Models;
 using UpWorker.Core.Services;
-using System.Data.SQLite;
-using ColorCode.Compilation.Languages;
 
 namespace UpWorker.ViewModels;
 
 public partial class FeedViewModel : ObservableRecipient, INavigationAware
 {
-    
+
 
     [ObservableProperty]
-    private JobListing? selected;
+    private Job? selected;
 
-    public ObservableCollection<JobListing> SampleItems { get; private set; } = new ObservableCollection<JobListing>();
+    public ObservableCollection<Job> SampleItems { get; private set; } = new ObservableCollection<Job>();
 
 
     public async void OnNavigatedTo(object parameter)
     {
         SampleItems.Clear();
         // pull first few items from database
-        using (var conn = SQLiteDataAccess.GetConnection())
+        using (var conn = DataAccess.GetConnection())
         {
+            conn.Open();
             string query = @"
             select 
                 *
-            from job_listings
+            from Jobs
             order by posted_on desc
             limit 25
             ";
-            using (var cmd = new SQLiteCommand(query, conn))
+            using (var cmd = conn.CreateCommand())
             {
+                cmd.CommandText = query;
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -51,7 +50,7 @@ public partial class FeedViewModel : ObservableRecipient, INavigationAware
                             ShowSymbolCode = 57640;
                             ShowSymbolName = "World";
                         }
-                        var job = new JobListing
+                        var job = new Job
                         {
                             Title = reader["title"].ToString(),
                             Category = reader["category"].ToString(),
