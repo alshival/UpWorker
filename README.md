@@ -4,6 +4,8 @@
 
 Stay ahead in the freelance game with **UpworkER**—your personal job alert assistant. With customizable RSS feeds directly from Upwork, never miss out on an opportunity that matches your skills. Get instant toast notifications for new job postings, and with a single click, view the full listing within **UpworkER**. Plus, explore our Jobs Feed section to swiftly navigate through the latest openings. Originally crafted as an in-house tool by The Data Team at Alshival's Data Service, **UpworkER** is now available for all to streamline their job search.
 
+[Demo Video](https://vimeo.com/936644607?share=copy)
+
 [![Design 11](https://github.com/alshival/UpworkER/assets/129638420/f47b4f0f-8f40-4dea-b258-fd12260dfb94)](https://vimeo.com/936644607?share=copy)
 
 
