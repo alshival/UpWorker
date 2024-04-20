@@ -34,9 +34,13 @@ public sealed partial class FeedControl : UserControl
         if (sender is HyperlinkButton hyperlinkButton && hyperlinkButton.Content is string urlString)
         {
             var navigationService = App.GetService<INavigationService>();
-            if (navigationService != null)
+            if (Uri.TryCreate(urlString, UriKind.Absolute, out var uri))
             {
-                navigationService.NavigateToWebView(typeof(WebViewViewModel).FullName, new Uri(urlString));
+                _ = navigationService.NavigateToWebView(typeof(WebViewViewModel).FullName, uri);
+            }
+            else
+            {
+                // Handle the error, perhaps log it or show a user-friendly message
             }
         }
     }

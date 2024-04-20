@@ -15,9 +15,10 @@ public sealed partial class FeedPage : Page
 
     public FeedPage()
     {
-        ViewModel = App.GetService<FeedViewModel>();
+        ViewModel = App.GetService<FeedViewModel>() ?? throw new InvalidOperationException("FeedViewModel could not be retrieved.");
         InitializeComponent();
     }
+
 
     private void OnViewStateChanged(object sender, ListDetailsViewState e)
     {

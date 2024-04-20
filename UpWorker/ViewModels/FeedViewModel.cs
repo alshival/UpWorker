@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Data.Sqlite;
 using UpWorker.Contracts.ViewModels;
 using UpWorker.Models;
 using UpWorker.Services;
@@ -23,50 +24,61 @@ public partial class FeedViewModel : ObservableRecipient, INavigationAware
         using (var conn = DataAccess.GetConnection())
         {
             conn.Open();
-            string query = @"
+            string sql = @"
             select 
-                *
+                title,
+                category, 
+                posted_on,
+                skills,
+                location_requirement,
+                country,
+                payment,
+                link,
+                url
             from Jobs
             order by posted_on desc
             limit 25
             ";
-            using (var cmd = conn.CreateCommand())
-            {
-                cmd.CommandText = query;
-                using (var reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        int ShowSymbolCode;
-                        string ShowSymbolName;
+            
+            var cmd = new SqliteCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = sql;
 
-                        if (reader["location_requirement"] != DBNull.Value && !string.IsNullOrEmpty(reader["location_requirement"].ToString()))
-                        {
-                            ShowSymbolCode = 57615;
-                            ShowSymbolName = "Home";
-                        }
-                        else
-                        {
-                            ShowSymbolCode = 57640;
-                            ShowSymbolName = "World";
-                        }
-                        var job = new Job
-                        {
-                            Title = reader["title"].ToString(),
-                            Category = reader["category"].ToString(),
-                            PostedOn = reader["posted_on"].ToString(),
-                            Skills = reader["skills"].ToString().Split(", ").ToList(),
-                            LocationRequirement = reader["location_requirement"].ToString(),
-                            Country = reader["country"].ToString(),
-                            Payment = reader["payment"].ToString(),
-                            Link = reader["link"].ToString(),
-                            Notified = Convert.ToBoolean(reader["notified"]),
-                            SymbolName = ShowSymbolName,
-                            SymbolCode = ShowSymbolCode
-                        };
-                        SampleItems.Add(job);
-                    }
+            SqliteDataReader reader = cmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                int ShowSymbolCode;
+                string ShowSymbolName;
+
+                if (reader["location_requirement"] != null && !string.IsNullOrEmpty(reader["location_requirement"].ToString()))
+                {
+                    ShowSymbolCode = 57615;
+                    ShowSymbolName = "Home";
                 }
+                else
+                {
+                    ShowSymbolCode = 57640;
+                    ShowSymbolName = "World";
+                }
+
+                var job = new Job
+                {
+
+                    Title = reader["title"].ToString() ?? string.Empty,
+                    Category = reader["category"].ToString() ?? string.Empty,
+                    PostedOn = reader["posted_on"].ToString() ?? string.Empty,
+                    Skills = reader["skills"]?.ToString()?.Split(new string[] { ", " }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
+                    LocationRequirement = reader["location_requirement"].ToString() ?? string.Empty,
+                    Country = reader["country"]?.ToString() ?? string.Empty,
+                    Payment = reader["payment"]?.ToString() ?? string.Empty,
+                    Link = reader["link"]?.ToString() ?? string.Empty,
+                    Url = reader["url"]?.ToString() ?? string.Empty,
+                    SymbolName = ShowSymbolName,
+                    SymbolCode = ShowSymbolCode
+
+                };
+                SampleItems.Add(job);
             }
         }
     }
