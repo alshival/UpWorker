@@ -184,13 +184,18 @@ public class DataAccess
         {
             connection.Open();
 
-            var cmd = new SqliteCommand("SELECT Name, Url FROM RssURLs WHERE enabled = 1", connection);
+            var cmd = new SqliteCommand("SELECT id, name, url FROM RssURLs WHERE enabled = 1", connection);
 
             SqliteDataReader query = cmd.ExecuteReader();
 
             while (query.Read())
             {
-                rssUrls.Add(new RssURL { Name = query.GetString(0), Url = query.GetString(1) });
+                rssUrls.Add(new RssURL 
+                { 
+                    Id = query.GetInt32(0), 
+                    Name = query.GetString(1), 
+                    Url = query.GetString(2) 
+                });
             }
         }
 
@@ -272,7 +277,7 @@ public class DataAccess
                 cmd.ExecuteNonQuery();
             }
         }
-        catch (SqliteException)
+        catch
         {
             Console.WriteLine("Skipping duplicate entry: " + job.Title);
         }
@@ -312,17 +317,17 @@ public class DataAccess
             {
                 var job = new Job
                 {
-                    Title = query["title"].ToString(),
-                    Category = query["category"].ToString(),
-                    PostedOn = query["posted_on"].ToString(),
-                    Skills = query["skills"].ToString().Split(", ").ToList(),
-                    LocationRequirement = query["location_requirement"].ToString(),
-                    Country = query["country"].ToString(),
-                    Payment = query["payment"].ToString(),
-                    Link = query["link"].ToString(),
+                    Title = query["title"].ToString() ?? string.Empty,
+                    Category = query["category"].ToString() ?? string.Empty,
+                    PostedOn = query["posted_on"].ToString() ?? string.Empty,
+                    Skills = query["skills"]?.ToString()?.Split(new string[] { ", " }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
+                    LocationRequirement = query["location_requirement"].ToString() ?? string.Empty,
+                    Country = query["country"].ToString() ?? string.Empty,
+                    Payment = query["payment"].ToString() ?? string.Empty,
+                    Link = query["link"].ToString() ?? string.Empty,
                     Notified = Convert.ToBoolean(query["notified"]),
-                    Url = query["url"].ToString(),
-                    InsertDateTime = query["insert_datetime"].ToString()
+                    Url = query["url"].ToString() ?? string.Empty,
+                    InsertDateTime = query["insert_datetime"].ToString() ?? string.Empty
                 };
 
                 jobs.Add(job);
@@ -348,34 +353,34 @@ public class DataAccess
     }
 
 
-    public class RelayCommand : ICommand
+
+}
+
+public class RelayCommand : ICommand
+{
+    private Action<object> execute;
+    private Func<object, bool> canExecute;
+
+    public event EventHandler CanExecuteChanged;
+
+    public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
     {
-        private Action<object> execute;
-        private Func<object, bool> canExecute;
-
-        public event EventHandler CanExecuteChanged;
-
-        public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
-        {
-            this.execute = execute;
-            this.canExecute = canExecute;
-        }
-
-        public bool CanExecute(object parameter)
-        {
-            return canExecute == null || canExecute(parameter);
-        }
-
-        public void Execute(object parameter)
-        {
-            execute(parameter);
-        }
-
-        public void RaiseCanExecuteChanged()
-        {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-        }
+        this.execute = execute;
+        this.canExecute = canExecute;
     }
 
+    public bool CanExecute(object parameter)
+    {
+        return canExecute == null || canExecute(parameter);
+    }
 
+    public void Execute(object parameter)
+    {
+        execute(parameter);
+    }
+
+    public void RaiseCanExecuteChanged()
+    {
+        CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+    }
 }

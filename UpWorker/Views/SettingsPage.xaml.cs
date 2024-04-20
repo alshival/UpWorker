@@ -25,8 +25,8 @@ public sealed partial class SettingsPage : Page
     {
         ViewModel = App.GetService<SettingsViewModel>();
         InitializeComponent();
-        urlListView.ItemsSource = UrlEntries;
         LoadUrls();
+        urlListView.ItemsSource = UrlEntries;
         appNotificationService = App.GetService<IAppNotificationService>();
     }
 
@@ -49,6 +49,9 @@ public sealed partial class SettingsPage : Page
                 RssParser rssParser = new RssParser();
                 await rssParser.FetchAndProcessRSS(url);
                 statusTextBlock.Text = "RSS Data Updated!";
+                statusTextBlock.Foreground = new SolidColorBrush(Microsoft.UI.Colors.Green);
+                ReloadUrls();
+                statusTextBlock.Text = "Urls Reloaded!";
                 statusTextBlock.Foreground = new SolidColorBrush(Microsoft.UI.Colors.Green);
                 notifydata = DataAccess.GetUnnotifiedJobs();
                 // Send a notification
@@ -77,10 +80,12 @@ public sealed partial class SettingsPage : Page
 
     private void LoadUrls()
     {
+        UrlEntries.Clear();
         var urls = DataAccess.GetRssUrls();
         foreach (var url in urls)
         {
-            url.DeleteCommand = new DataAccess.RelayCommand(param => DeleteUrl((int)param));
+            url.DeleteCommand = new RelayCommand(param => DeleteUrl((int)param));
+            UrlEntries.Add(url); 
         }
     }
 
@@ -100,13 +105,14 @@ public sealed partial class SettingsPage : Page
     public void DeleteUrl(int id)
     {
         var item = UrlEntries.FirstOrDefault(x => x.Id == id);
-        DataAccess.DeleteRssUrl(id);
         if (item != null)
         {
+            DataAccess.DeleteRssUrl(item.Id);
             UrlEntries.Remove(item);
         }
         statusTextBlock.Text = "Entry Deleted Successfully!";
         statusTextBlock.Foreground = new SolidColorBrush(Microsoft.UI.Colors.Green);
+        ReloadUrls();
     }
 
     private void RefreshRateComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

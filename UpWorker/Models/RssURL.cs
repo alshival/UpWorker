@@ -25,7 +25,7 @@ public class RssURL
         get; set;
     }
 
-    public ICommand DeleteCommand
+    public ICommand? DeleteCommand
     {
         get; set;
     }
