@@ -27,6 +27,32 @@
     <AppInstallerUri>C:\Users\samue\AppData\Local\UpWorker\</AppInstallerUri>
   </PropertyGroup>
   <ItemGroup>
+    <Content Remove="Assets\logo.altform-lightunplated_targetsize-16.png" />
+    <Content Remove="Assets\logo.altform-lightunplated_targetsize-24.png" />
+    <Content Remove="Assets\logo.altform-lightunplated_targetsize-256.png" />
+    <Content Remove="Assets\logo.altform-lightunplated_targetsize-32.png" />
+    <Content Remove="Assets\logo.altform-lightunplated_targetsize-48.png" />
+    <Content Remove="Assets\logo.altform-unplated_targetsize-16.png" />
+    <Content Remove="Assets\logo.altform-unplated_targetsize-24.png" />
+    <Content Remove="Assets\logo.altform-unplated_targetsize-256.png" />
+    <Content Remove="Assets\logo.altform-unplated_targetsize-32.png" />
+    <Content Remove="Assets\logo.altform-unplated_targetsize-48.png" />
+    <Content Remove="Assets\logo.targetsize-16.png" />
+    <Content Remove="Assets\logo.targetsize-24.png" />
+    <Content Remove="Assets\logo.targetsize-256.png" />
+    <Content Remove="Assets\logo.targetsize-32.png" />
+    <Content Remove="Assets\logo.targetsize-48.png" />
+    <Content Remove="Assets\logo_splash.scale-100.png" />
+    <Content Remove="Assets\logo_splash.scale-125.png" />
+    <Content Remove="Assets\logo_splash.scale-150.png" />
+    <Content Remove="Assets\logo_splash.scale-200.png" />
+    <Content Remove="Assets\logo_splash.scale-400.png" />
+    <Content Remove="Assets\Wide310x150Logo.scale-100.png" />
+    <Content Remove="Assets\Wide310x150Logo.scale-125.png" />
+    <Content Remove="Assets\Wide310x150Logo.scale-150.png" />
+    <Content Remove="Assets\Wide310x150Logo.scale-400.png" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="Views\FeedControl.xaml" />
     <None Remove="Views\FeedPage.xaml" />
   </ItemGroup>

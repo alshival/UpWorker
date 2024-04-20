@@ -80,6 +80,7 @@
                         <ComboBoxItem Content="6 hours" Tag="-6 hours"/>
                         <ComboBoxItem Content="12 hours" Tag="-12 hours"/>
                         <ComboBoxItem Content="1 day" Tag="-1 days"/>
+                        <ComboBoxItem Content="3 days" Tag="-3 days"/>
                     </ComboBox>
                 </StackPanel>
                 <!-- Delete Data -->

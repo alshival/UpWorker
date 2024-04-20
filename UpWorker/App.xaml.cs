@@ -143,15 +143,11 @@ public partial class App : Application
         RssParser rssParser = new RssParser();
         //Refresh URLs
         List<Job> notifydata;
-        using (var conn = DataAccess.GetConnection())
+
+        var refreshList = DataAccess.GetRssUrls();
+        foreach (var url in refreshList)
         {
-            conn.Open();
-            var refreshList = DataAccess.GetRssUrls();
-            foreach (var url in refreshList)
-            {
-                await rssParser.FetchAndProcessRSS(url.Url);
-            }
-            conn.Close();
+            await rssParser.FetchAndProcessRSS(url.Url);
         }
         notifydata = DataAccess.GetUnnotifiedJobs();
         // Send a notification
@@ -174,8 +170,8 @@ public partial class App : Application
         base.OnLaunched(args);
         DataAccess.InitializeSettings();
         DataAccess.InitializeDatabase();
-        //RefreshFeed();
-        //SetupTimer();
+        RefreshFeed();
+        SetupTimer();
 
         // Retrieve the notification service
         appNotificationService = App.GetService<IAppNotificationService>();

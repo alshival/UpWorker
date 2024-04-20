@@ -48,11 +48,6 @@ public sealed partial class SettingsPage : Page
                 entryNameInput.Text = "";
                 RssParser rssParser = new RssParser();
                 await rssParser.FetchAndProcessRSS(url);
-                statusTextBlock.Text = "RSS Data Updated!";
-                statusTextBlock.Foreground = new SolidColorBrush(Microsoft.UI.Colors.Green);
-                ReloadUrls();
-                statusTextBlock.Text = "Urls Reloaded!";
-                statusTextBlock.Foreground = new SolidColorBrush(Microsoft.UI.Colors.Green);
                 notifydata = DataAccess.GetUnnotifiedJobs();
                 // Send a notification
                 foreach (var job in notifydata)
@@ -97,6 +92,7 @@ public sealed partial class SettingsPage : Page
             var jobListing = RssParser.FromRssItem(item);
             if (jobListing != null)
             {
+                jobListing.Url = url;
                 DataAccess.InsertJobListing(jobListing);
             }
         }
