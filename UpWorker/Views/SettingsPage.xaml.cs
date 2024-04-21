@@ -8,6 +8,7 @@ using UpWorker.Helpers;
 using UpWorker.Models;
 using UpWorker.Services;
 using UpWorker.ViewModels;
+using Windows.System;
 
 namespace UpWorker.Views;
 
@@ -186,5 +187,20 @@ public sealed partial class SettingsPage : Page
         }
     }
 
+    private void visit_our_site(object sender, RoutedEventArgs e)
+    {
+        if (sender is HyperlinkButton hyperlinkButton && hyperlinkButton.Content is string urlString)
+        {
 
+            var navigationService = App.GetService<INavigationService>();
+            if (Uri.TryCreate(urlString, UriKind.Absolute, out var uri))
+            {
+                _ = navigationService.NavigateToWebView(typeof(WebViewViewModel).FullName, uri);
+            }
+            else
+            {
+                // Handle the error, perhaps log it or show a user-friendly message
+            }
+        }
+    }
 }
