@@ -1,5 +1,7 @@
 ﻿using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
+using HtmlAgilityPack;
 using Microsoft.Data.Sqlite;
 using UpWorker.Contracts.ViewModels;
 using UpWorker.Models;
@@ -16,7 +18,6 @@ public partial class FeedViewModel : ObservableRecipient, INavigationAware
 
     public ObservableCollection<Job> SampleItems { get; private set; } = new ObservableCollection<Job>();
 
-
     public async void OnNavigatedTo(object parameter)
     {
         SampleItems.Clear();
@@ -28,6 +29,7 @@ public partial class FeedViewModel : ObservableRecipient, INavigationAware
             select 
                 title,
                 category, 
+                job_description,
                 posted_on,
                 skills,
                 location_requirement,
@@ -67,6 +69,7 @@ public partial class FeedViewModel : ObservableRecipient, INavigationAware
 
                     Title = reader["title"].ToString() ?? string.Empty,
                     Category = reader["category"].ToString() ?? string.Empty,
+                    JobDescription = reader["job_description"].ToString() ?? string.Empty,
                     PostedOn = reader["posted_on"].ToString() ?? string.Empty,
                     Skills = reader["skills"]?.ToString()?.Split(new string[] { ", " }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
                     LocationRequirement = reader["location_requirement"].ToString() ?? string.Empty,

@@ -81,7 +81,7 @@ public class DataAccess
     //#####################################################################################
     // SQL Data 
     //#####################################################################################
-    static string dbpath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "UpWorker.db");
+    static string dbpath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "UpworkER.db");
     private static string connectionstring = $"Data Source={dbpath};";
 
     public static SqliteConnection GetConnection()
@@ -123,6 +123,7 @@ public class DataAccess
                         id INTEGER PRIMARY KEY,
                         title TEXT NULL,
                         category TEXT,
+                        job_description TEXT,
                         posted_on DATETIME,
                         skills TEXT,
                         location_requirement TEXT,
@@ -217,7 +218,6 @@ public class DataAccess
     }
 
 
-
     public static void DeleteOldJobs()
     {
         var deleteSetting = DataAccess.GetSetting("ClearDataTimeFrame");
@@ -255,14 +255,15 @@ public class DataAccess
                 cmd.Connection = conn;
                 cmd.CommandText = @"
                 INSERT INTO Jobs
-                (title, category, posted_on, skills, location_requirement, country, payment, link, notified, url, insert_datetime)
+                (title, category, job_description, posted_on, skills, location_requirement, country, payment, link, notified, url, insert_datetime)
                 VALUES
-                (@title, @category, @posted_on, @skills, @location, @country, @payment, @link, @notified, @url, @insert_datetime)
+                (@title, @category, @job_description, @posted_on, @skills, @location, @country, @payment, @link, @notified, @url, @insert_datetime)
                 "; ;
 
                 // Adding parameters and handling nulls
                 cmd.Parameters.AddWithValue("@title", job.Title ?? string.Empty); // Assuming empty string is acceptable for 'title'
                 cmd.Parameters.AddWithValue("@category", job.Category ?? string.Empty); // Ditto for 'category'
+                cmd.Parameters.AddWithValue("@job_description", job.JobDescription ?? string.Empty);
                 cmd.Parameters.AddWithValue("@posted_on", job.PostedOn ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@skills", job.Skills != null ? string.Join(", ", job.Skills) : (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@location", job.LocationRequirement ?? (object)DBNull.Value);

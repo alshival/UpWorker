@@ -16,6 +16,11 @@ public class Job
         get; set;
     }
 
+    public string JobDescription
+    {
+        get; set; 
+    }
+
     public string PostedOn
     {
         get; set;

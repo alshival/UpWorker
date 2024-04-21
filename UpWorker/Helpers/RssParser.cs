@@ -1,8 +1,14 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics;
+using System.Globalization;
 using System.ServiceModel.Syndication;
+using System.Text.RegularExpressions;
 using System.Xml;
+using HtmlAgilityPack;
 using UpWorker.Models;
 using UpWorker.Services;
+using System.Text.RegularExpressions;
+using System;
+using System.IO;
 
 namespace UpWorker.Helpers;
 
@@ -30,12 +36,47 @@ public class RssParser
         }
     }
 
+    public static string StripHtmlTags(string input)
+    {
+        string result = Regex.Replace(input, "<.*?>", string.Empty);
+        result = Regex.Replace(result,"click to apply","");
+        result = Regex.Replace(result, "&#039;", "'");
+        result = Regex.Replace(result, "&amp;","&");
+        result = Regex.Replace(result, "&rdquo;", "\"");
+        result = Regex.Replace(result, "&quot;", "\"");
+        result = Regex.Replace(result, "quot;", "\"");
+        result = Regex.Replace(result, "&nbsp;", " ");
+        result = Regex.Replace(result, "&bull;", "•");
+        result = Regex.Replace(result, "&oacute;", "ó");
+        result = Regex.Replace(result, "&ograve;", "ò");
+        result = Regex.Replace(result, "&aacute;", "á");
+        result = Regex.Replace(result, "&agrave;", "à");
+        result = Regex.Replace(result, "&eacute;", "é");
+        result = Regex.Replace(result, "&ugrave;", "ù");
+        result = Regex.Replace(result, "&uacute;", "ú");
+        result = Regex.Replace(result, "&yacute;", "ý");
+        result = Regex.Replace(result, "&iacute;", "í");
+
+
+
+        return result;
+    }
+    public static string ConvertHtmlToRtf(string html)
+    {
+        // Simple replacement, expand this according to your needs
+        string rtf = html.Replace("<b>", @"\b ").Replace("</b>", @"\b0 ");
+        rtf = Regex.Replace(rtf, "<.*?>", ""); // Strip other tags
+        return @"{\rtf1\ansi " + rtf + "}";
+    }
+
+
     public static Job FromRssItem(SyndicationItem item)
     {
         // Correctly extracting the first link as a string
         var link = item.Links.FirstOrDefault()?.Uri.ToString() ?? "";
         var description = item.Summary?.Text ?? "";
 
+        var jobdescription = StripHtmlTags(Regex.Replace(description, "<b>.*", ""));
         var category = ExtractField(description, "<b>Category</b>:");
         var skills = description.Split("<b>Skills</b>:")
                                 .Skip(1)
@@ -70,6 +111,7 @@ public class RssParser
         {
             Title = item.Title.Text ?? "",
             Category = category,
+            JobDescription = jobdescription,
             PostedOn = formattedPostedOn,
             Skills = skills,
             LocationRequirement = locationRequirement,
