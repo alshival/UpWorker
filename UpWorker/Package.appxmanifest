@@ -12,7 +12,7 @@
 
   <Identity
     Name="AlshivalsDataService.Upworker"
-    Publisher="CN=Alshival&apos;s Data Service"
+    Publisher="CN=9B3D3FD2-7D6C-411B-8758-7862960A5ABD"
     Version="1.0.7.0" />
     
   <mp:PhoneIdentity PhoneProductId="692eb5a3-14bf-43ef-8819-9797e7c948a2" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
