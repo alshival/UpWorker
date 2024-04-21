@@ -3,7 +3,6 @@ using System.Globalization;
 using System.ServiceModel.Syndication;
 using System.Text.RegularExpressions;
 using System.Xml;
-using HtmlAgilityPack;
 using UpWorker.Models;
 using UpWorker.Services;
 using System.Text.RegularExpressions;
@@ -60,13 +59,6 @@ public class RssParser
 
 
         return result;
-    }
-    public static string ConvertHtmlToRtf(string html)
-    {
-        // Simple replacement, expand this according to your needs
-        string rtf = html.Replace("<b>", @"\b ").Replace("</b>", @"\b0 ");
-        rtf = Regex.Replace(rtf, "<.*?>", ""); // Strip other tags
-        return @"{\rtf1\ansi " + rtf + "}";
     }
 
 

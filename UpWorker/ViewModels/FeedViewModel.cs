@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
-using HtmlAgilityPack;
 using Microsoft.Data.Sqlite;
 using UpWorker.Contracts.ViewModels;
 using UpWorker.Models;
