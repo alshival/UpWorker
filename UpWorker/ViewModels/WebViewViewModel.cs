@@ -29,6 +29,8 @@ public partial class WebViewViewModel : ObservableRecipient, INavigationAware
         get;
     }
 
+    private Uri _lastVisitedUri;
+
     public WebViewViewModel(IWebViewService webViewService)
     {
         WebViewService = webViewService;
@@ -93,7 +95,7 @@ public partial class WebViewViewModel : ObservableRecipient, INavigationAware
         // Optionally handle the case where no valid parameter is passed
         else
         {
-            Source = new Uri("https://docs.microsoft.com/windows/apps/"); // Default URL or handle appropriately
+            Source = new Uri("https://alshival.com"); // Default URL or handle appropriately
         }
 
     }

@@ -32,6 +32,7 @@ public class WebViewService : IWebViewService
         _webView.NavigationCompleted += OnWebViewNavigationCompleted;
     }
 
+
     public void GoBack() => _webView?.GoBack();
 
     public void GoForward() => _webView?.GoForward();
@@ -42,9 +43,33 @@ public class WebViewService : IWebViewService
     {
         if (_webView != null)
         {
+            _webView.CoreWebView2.OpenDevToolsWindow();
             _webView.NavigationCompleted -= OnWebViewNavigationCompleted;
         }
     }
 
-    private void OnWebViewNavigationCompleted(WebView2 sender, CoreWebView2NavigationCompletedEventArgs args) => NavigationCompleted?.Invoke(this, args.WebErrorStatus);
+    //private void OnWebViewNavigationCompleted(WebView2 sender, CoreWebView2NavigationCompletedEventArgs args) => NavigationCompleted?.Invoke(this, args.WebErrorStatus);
+    private async void OnWebViewNavigationCompleted(WebView2 sender, CoreWebView2NavigationCompletedEventArgs args)
+    {
+        if (args.IsSuccess)
+        {
+            // Navigation succeeded, invoke the completed event with no error status.
+            NavigationCompleted?.Invoke(this, CoreWebView2WebErrorStatus.Unknown);
+            var cookieManager = sender.CoreWebView2.CookieManager;
+            var cookies = await cookieManager.GetCookiesAsync("https://www.facebook.com");
+            Console.WriteLine("Navigation to " + sender.Source + " completed successfully.");
+            foreach (var cookie in cookies)
+            {
+                cookieManager.DeleteCookie(cookie);
+            }
+        }
+        else
+        {
+            // Navigation failed, log the error and invoke the completed event with the error status.
+            Console.WriteLine("Failed to navigate to " + sender.Source + ". Error: " + args.WebErrorStatus);
+            NavigationCompleted?.Invoke(this, args.WebErrorStatus);
+        }
+        sender.EnsureCoreWebView2Async(null);
+    }
+
 }
