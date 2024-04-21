@@ -8,6 +8,7 @@ Stay ahead in the freelance game with **UpworkER**—your personal job alert ass
 
 [![Design 11](https://github.com/alshival/UpworkER/assets/129638420/f47b4f0f-8f40-4dea-b258-fd12260dfb94)](https://vimeo.com/936644607?share=copy)
 
+**NOTE**: Currently, you can browse jobs through the app, but you cannot submit proposals. To submit a proposal, click on the globe in the bottom right corner to open it in your browser. Perhaps in the future we will get this feature to work, but there appears to be some issue with the site's cookies or javascript in WebView2.
 
 ### **Features:**
 - **Customizable RSS Feeds:** Tailor your job search with feeds that cater to your expertise.
