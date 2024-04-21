@@ -119,6 +119,7 @@ public sealed partial class SettingsPage : Page
             DataAccess.SetSetting("RefreshRate", new Setting(refreshRate, true));
             Console.WriteLine("Refresh rate setting updated to: " + refreshRate);
         }
+        App.RestartAppTimer();
     }
 
     private void NotificationTimeFrameComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

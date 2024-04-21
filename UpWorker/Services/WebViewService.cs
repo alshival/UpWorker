@@ -54,6 +54,7 @@ public class WebViewService : IWebViewService
         {
             // Navigation succeeded, invoke the completed event with no error status.
             NavigationCompleted?.Invoke(this, CoreWebView2WebErrorStatus.Unknown);
+            sender.CoreWebView2.Profile.PreferredTrackingPreventionLevel = CoreWebView2TrackingPreventionLevel.Basic;
             sender.CoreWebView2.Settings.IsScriptEnabled = true;
             var cookieManager = sender.CoreWebView2.CookieManager;
             var cookies = await cookieManager.GetCookiesAsync("");

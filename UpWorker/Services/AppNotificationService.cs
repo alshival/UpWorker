@@ -5,6 +5,7 @@ using Microsoft.Windows.AppNotifications;
 
 using UpWorker.Contracts.Services;
 using UpWorker.ViewModels;
+using Windows.System;
 
 namespace UpWorker.Notifications;
 
@@ -29,7 +30,7 @@ public class AppNotificationService : IAppNotificationService
         AppNotificationManager.Default.Register();
     }
 
-    public void OnNotificationInvoked(AppNotificationManager sender, AppNotificationActivatedEventArgs args)
+    public async void OnNotificationInvoked(AppNotificationManager sender, AppNotificationActivatedEventArgs args)
     {
         // TODO: Handle notification invocations when your app is already running.
 
@@ -46,11 +47,16 @@ public class AppNotificationService : IAppNotificationService
         var urlString = arguments["url"];
         if (!string.IsNullOrEmpty(urlString) && Uri.TryCreate(urlString, UriKind.Absolute, out Uri uri))
         {
-            App.MainWindow.DispatcherQueue.TryEnqueue(() =>
-            {
-                _navigationService.NavigateToWebView(typeof(WebViewViewModel).FullName, uri);
-                App.MainWindow.BringToFront();
-            });
+            //// For now, we are not using the webview because of a bug: https://github.com/microsoft/microsoft-ui-xaml/issues/9566
+            /// Leaving the code here until it is patched. 
+
+            //App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+            //{
+            //    _navigationService.NavigateToWebView(typeof(WebViewViewModel).FullName, uri);
+            //    App.MainWindow.BringToFront();
+            //});
+            
+            bool success = await Launcher.LaunchUriAsync(uri);
         }
     }
 

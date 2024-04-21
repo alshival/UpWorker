@@ -74,5 +74,5 @@ public class Job
     public string ShortDescription => $"{Title} - {Payment}";
     public string SkillList => string.Join(", ", Skills).ToString();
     public char Symbol => (char)SymbolCode;
-    public string notificationPayload => $"<toast launch=\"action=ToastClick&amp;url={Link}\"><visual><binding template=\"ToastGeneric\"><text>{Title}</text><text>{Payment}</text><text>Check the app for more details.</text></binding></visual></toast>";
+    public string notificationPayload => $"<toast launch=\"action=ToastClick&amp;url={Link}\"><visual><binding template=\"ToastGeneric\"><text>{Title}</text><text>{Payment}</text><text>Click here for more details.</text></binding></visual></toast>";
 }
