@@ -43,7 +43,6 @@ public class WebViewService : IWebViewService
     {
         if (_webView != null)
         {
-            _webView.CoreWebView2.OpenDevToolsWindow();
             _webView.NavigationCompleted -= OnWebViewNavigationCompleted;
         }
     }
@@ -55,13 +54,11 @@ public class WebViewService : IWebViewService
         {
             // Navigation succeeded, invoke the completed event with no error status.
             NavigationCompleted?.Invoke(this, CoreWebView2WebErrorStatus.Unknown);
+            sender.CoreWebView2.Settings.IsScriptEnabled = true;
             var cookieManager = sender.CoreWebView2.CookieManager;
-            var cookies = await cookieManager.GetCookiesAsync("https://www.facebook.com");
+            var cookies = await cookieManager.GetCookiesAsync("");
+            //var applyCookies = await cookieManager.GetCookiesAsync("apply/");
             Console.WriteLine("Navigation to " + sender.Source + " completed successfully.");
-            foreach (var cookie in cookies)
-            {
-                cookieManager.DeleteCookie(cookie);
-            }
         }
         else
         {
@@ -69,7 +66,7 @@ public class WebViewService : IWebViewService
             Console.WriteLine("Failed to navigate to " + sender.Source + ". Error: " + args.WebErrorStatus);
             NavigationCompleted?.Invoke(this, args.WebErrorStatus);
         }
-        sender.EnsureCoreWebView2Async(null);
+        await sender.EnsureCoreWebView2Async(null);
     }
 
 }
