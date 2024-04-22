@@ -3,6 +3,14 @@
 
 **Developed by:** The Data Team @ [Alshival's Data Service](https://Alshival.com)
 
+<p align="center">
+    <a href="https://www.microsoft.com/store/productId/9P6LSJ5QS86P?ocid=pdpshare" target="_blank">
+       <img src="https://github.com/alshival/UpworkER/assets/129638420/69b129a0-a076-453a-b0f6-a7506fdfc382" alt="Open Microsoft Store">
+    </a>
+</p>
+
+
+
 ![Screenshot 2024-04-20 162141](https://github.com/alshival/UpworkER/assets/129638420/11bf2672-04d1-4ef9-9abf-7f0a3e650812)
 
 
