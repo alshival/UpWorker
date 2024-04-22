@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Data.Sqlite;
 using UpWorker.Contracts.ViewModels;
@@ -40,7 +39,7 @@ public partial class FeedViewModel : ObservableRecipient, INavigationAware
             order by posted_on desc
             limit 25
             ";
-            
+
             var cmd = new SqliteCommand();
             cmd.Connection = conn;
             cmd.CommandText = sql;

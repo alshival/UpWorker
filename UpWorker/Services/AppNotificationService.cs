@@ -4,7 +4,6 @@ using System.Web;
 using Microsoft.Windows.AppNotifications;
 
 using UpWorker.Contracts.Services;
-using UpWorker.ViewModels;
 using Windows.System;
 
 namespace UpWorker.Notifications;
@@ -55,7 +54,7 @@ public class AppNotificationService : IAppNotificationService
             //    _navigationService.NavigateToWebView(typeof(WebViewViewModel).FullName, uri);
             //    App.MainWindow.BringToFront();
             //});
-            
+
             bool success = await Launcher.LaunchUriAsync(uri);
         }
     }

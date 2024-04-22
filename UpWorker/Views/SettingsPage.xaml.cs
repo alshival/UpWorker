@@ -8,7 +8,6 @@ using UpWorker.Helpers;
 using UpWorker.Models;
 using UpWorker.Services;
 using UpWorker.ViewModels;
-using Windows.System;
 
 namespace UpWorker.Views;
 
@@ -81,7 +80,7 @@ public sealed partial class SettingsPage : Page
         foreach (var url in urls)
         {
             url.DeleteCommand = new RelayCommand(param => DeleteUrl((int)param));
-            UrlEntries.Add(url); 
+            UrlEntries.Add(url);
         }
     }
 

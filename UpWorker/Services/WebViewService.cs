@@ -47,6 +47,11 @@ public class WebViewService : IWebViewService
         }
     }
 
+    public void Cleanup()
+    {
+        _webView.Close();
+    }
+
     //private void OnWebViewNavigationCompleted(WebView2 sender, CoreWebView2NavigationCompletedEventArgs args) => NavigationCompleted?.Invoke(this, args.WebErrorStatus);
     private async void OnWebViewNavigationCompleted(WebView2 sender, CoreWebView2NavigationCompletedEventArgs args)
     {

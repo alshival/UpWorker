@@ -104,6 +104,7 @@ public partial class WebViewViewModel : ObservableRecipient, INavigationAware
     public void OnNavigatedFrom()
     {
         WebViewService.UnregisterEvents();
+        WebViewService.Cleanup();
         WebViewService.NavigationCompleted -= OnNavigationCompleted;
     }
 

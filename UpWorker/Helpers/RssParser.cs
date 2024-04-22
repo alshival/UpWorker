@@ -1,13 +1,9 @@
-﻿using System.Diagnostics;
-using System.Globalization;
+﻿using System.Globalization;
 using System.ServiceModel.Syndication;
 using System.Text.RegularExpressions;
 using System.Xml;
 using UpWorker.Models;
 using UpWorker.Services;
-using System.Text.RegularExpressions;
-using System;
-using System.IO;
 
 namespace UpWorker.Helpers;
 
@@ -38,9 +34,9 @@ public class RssParser
     public static string StripHtmlTags(string input)
     {
         string result = Regex.Replace(input, "<.*?>", string.Empty);
-        result = Regex.Replace(result,"click to apply","");
+        result = Regex.Replace(result, "click to apply", "");
         result = Regex.Replace(result, "&#039;", "'");
-        result = Regex.Replace(result, "&amp;","&");
+        result = Regex.Replace(result, "&amp;", "&");
         result = Regex.Replace(result, "&rdquo;", "\"");
         result = Regex.Replace(result, "&quot;", "\"");
         result = Regex.Replace(result, "quot;", "\"");

@@ -18,7 +18,7 @@ public class Job
 
     public string JobDescription
     {
-        get; set; 
+        get; set;
     }
 
     public string PostedOn

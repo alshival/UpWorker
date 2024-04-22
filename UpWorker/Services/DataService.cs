@@ -191,11 +191,11 @@ public class DataAccess
 
             while (query.Read())
             {
-                rssUrls.Add(new RssURL 
-                { 
-                    Id = query.GetInt32(0), 
-                    Name = query.GetString(1), 
-                    Url = query.GetString(2) 
+                rssUrls.Add(new RssURL
+                {
+                    Id = query.GetInt32(0),
+                    Name = query.GetString(1),
+                    Url = query.GetString(2)
                 });
             }
         }

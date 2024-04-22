@@ -1,8 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using UpWorker.Contracts.Services;
 using UpWorker.Models;
-using UpWorker.ViewModels;
 using Windows.System;
 
 namespace UpWorker.Views;
@@ -36,7 +34,7 @@ public sealed partial class FeedControl : UserControl
         {
             //// For now, we are not using the webview because of a bug: https://github.com/microsoft/microsoft-ui-xaml/issues/9566
             /// Leaving the code here until it is patched. 
-            
+
             //var navigationService = App.GetService<INavigationService>();
             //if (Uri.TryCreate(urlString, UriKind.Absolute, out var uri))
             //{

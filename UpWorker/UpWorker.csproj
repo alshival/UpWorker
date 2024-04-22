@@ -25,7 +25,7 @@
     <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
     <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
     <AppInstallerUri>C:\Users\samue\AppData\Local\UpWorker\</AppInstallerUri>
-    <PackageCertificateThumbprint>A4E253DF9E85932F7F0EF065FB94A4B547C6B64B</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>26BA8C8D5F430EF37EA71BAF14FFE3BA66581CAF</PackageCertificateThumbprint>
   </PropertyGroup>
   <ItemGroup>
     <Content Remove="Assets\logo.altform-lightunplated_targetsize-16.png" />
