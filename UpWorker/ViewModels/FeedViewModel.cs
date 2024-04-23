@@ -15,6 +15,24 @@ public partial class FeedViewModel : ObservableRecipient, INavigationAware
     private Job? selected;
 
     public ObservableCollection<Job> SampleItems { get; private set; } = new ObservableCollection<Job>();
+    public FeedViewModel()
+    {
+        App.DataRefreshed += OnDataRefreshed;
+    }
+    private void OnDataRefreshed(object sender, EventArgs e)
+    {
+        LoadData();
+        EnsureItemSelected();
+    }
+    public async void LoadData()
+    {
+        // Existing code to load data from the database.
+        OnNavigatedTo(null);
+    }
+    public void OnNavigatedFrom()
+    {
+        App.DataRefreshed -= OnDataRefreshed;  // Unsubscribe when the view model is not visible
+    }
 
     public async void OnNavigatedTo(object parameter)
     {
@@ -82,10 +100,6 @@ public partial class FeedViewModel : ObservableRecipient, INavigationAware
                 SampleItems.Add(job);
             }
         }
-    }
-
-    public void OnNavigatedFrom()
-    {
     }
 
     public void EnsureItemSelected()

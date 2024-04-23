@@ -32,7 +32,6 @@ public sealed partial class SettingsPage : Page
 
     private async void submitButton_Click(object sender, RoutedEventArgs e)
     {
-
         string url = urlInput.Text;
         string entryName = entryNameInput.Text;
         if (!string.IsNullOrEmpty(url) && !string.IsNullOrEmpty(entryName))

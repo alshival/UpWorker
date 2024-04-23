@@ -156,12 +156,21 @@ public partial class App : Application
             appNotificationService.Show(job.notificationPayload);
             DataAccess.MarkJobAsNotified(job);
         }
+        OnDataRefreshed();
     }
 
     private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
         // TODO: Log and handle exceptions as appropriate.
         // https://docs.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.application.unhandledexception.
+    }
+
+    public delegate void DataRefreshedEventHandler(object sender, EventArgs e);
+    public static event DataRefreshedEventHandler DataRefreshed;
+
+    protected virtual void OnDataRefreshed()
+    {
+        DataRefreshed?.Invoke(this, EventArgs.Empty);
     }
 
     protected async override void OnLaunched(LaunchActivatedEventArgs args)
