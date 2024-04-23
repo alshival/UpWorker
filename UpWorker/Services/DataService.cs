@@ -133,7 +133,8 @@ public class DataAccess
                         notified BOOLEAN NULL DEFAULT 0,
                         url TEXT NULL,
                         insert_datetime DATETIME,
-                        UNIQUE(title)
+                        identifier NOT NULL,
+                        UNIQUE(identifier)
                     );
                 ";
                     createJobsTableCmd.ExecuteNonQuery();
@@ -255,9 +256,9 @@ public class DataAccess
                 cmd.Connection = conn;
                 cmd.CommandText = @"
                 INSERT INTO Jobs
-                (title, category, job_description, posted_on, skills, location_requirement, country, payment, link, notified, url, insert_datetime)
+                (title, category, job_description, posted_on, skills, location_requirement, country, payment, link, notified, url, insert_datetime, identifier)
                 VALUES
-                (@title, @category, @job_description, @posted_on, @skills, @location, @country, @payment, @link, @notified, @url, @insert_datetime)
+                (@title, @category, @job_description, @posted_on, @skills, @location, @country, @payment, @link, @notified, @url, @insert_datetime, @identifier)
                 "; ;
 
                 // Adding parameters and handling nulls
@@ -274,6 +275,8 @@ public class DataAccess
                 cmd.Parameters.AddWithValue("@url", job.Url ?? string.Empty);
                 cmd.Parameters.AddWithValue("@insert_datetime", insertDateTime);
 
+                var identifier = (job.Title ?? string.Empty) + (job.PostedOn != null ? job.PostedOn.ToString() : string.Empty); // Convert DBNull.Value to string
+                cmd.Parameters.AddWithValue("@identifier", identifier);
 
                 cmd.ExecuteNonQuery();
             }

@@ -22,27 +22,15 @@ public partial class FeedViewModel : ObservableRecipient, INavigationAware
     private void OnDataRefreshed(object sender, EventArgs e)
     {
         LoadData();
-        EnsureItemSelected();
     }
     public async void LoadData()
     {
-        // Existing code to load data from the database.
-        OnNavigatedTo(null);
-    }
-    public void OnNavigatedFrom()
-    {
-        App.DataRefreshed -= OnDataRefreshed;  // Unsubscribe when the view model is not visible
-    }
-
-    public async void OnNavigatedTo(object parameter)
-    {
-        SampleItems.Clear();
-        // pull first few items from database
+        var newItems = new List<Job>();
         using (var conn = DataAccess.GetConnection())
         {
             conn.Open();
-            string sql = @"
-            select 
+            var cmd = new SqliteCommand(
+                @"select 
                 title,
                 category, 
                 job_description,
@@ -55,51 +43,68 @@ public partial class FeedViewModel : ObservableRecipient, INavigationAware
                 url
             from Jobs
             order by posted_on desc
-            limit 25
-            ";
+            limit 25", conn);
 
-            var cmd = new SqliteCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = sql;
-
-            SqliteDataReader reader = cmd.ExecuteReader();
-
-            while (reader.Read())
+            using (var reader = cmd.ExecuteReader())
             {
-                int ShowSymbolCode;
-                string ShowSymbolName;
-
-                if (reader["location_requirement"] != null && !string.IsNullOrEmpty(reader["location_requirement"].ToString()))
+                while (reader.Read())
                 {
-                    ShowSymbolCode = 57615;
-                    ShowSymbolName = "Home";
+                    var job = new Job
+                    {
+                        Title = reader["title"]?.ToString() ?? string.Empty,
+                        Category = reader["category"]?.ToString() ?? string.Empty,
+                        JobDescription = reader["job_description"]?.ToString() ?? string.Empty,
+                        PostedOn = reader["posted_on"]?.ToString() ?? string.Empty,
+                        Skills = reader["skills"]?.ToString()?.Split(new string[] { ", " }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
+                        LocationRequirement = reader["location_requirement"]?.ToString() ?? string.Empty,
+                        Country = reader["country"]?.ToString() ?? string.Empty,
+                        Payment = reader["payment"]?.ToString() ?? string.Empty,
+                        Link = reader["link"]?.ToString() ?? string.Empty,
+                        Url = reader["url"]?.ToString() ?? string.Empty,
+                        SymbolName = string.IsNullOrEmpty(reader["location_requirement"]?.ToString()) ? "World" : "Home",
+                        SymbolCode = string.IsNullOrEmpty(reader["location_requirement"]?.ToString()) ? 57640 : 57615
+                    };
+                    newItems.Add(job);
                 }
-                else
-                {
-                    ShowSymbolCode = 57640;
-                    ShowSymbolName = "World";
-                }
-
-                var job = new Job
-                {
-
-                    Title = reader["title"].ToString() ?? string.Empty,
-                    Category = reader["category"].ToString() ?? string.Empty,
-                    JobDescription = reader["job_description"].ToString() ?? string.Empty,
-                    PostedOn = reader["posted_on"].ToString() ?? string.Empty,
-                    Skills = reader["skills"]?.ToString()?.Split(new string[] { ", " }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
-                    LocationRequirement = reader["location_requirement"].ToString() ?? string.Empty,
-                    Country = reader["country"]?.ToString() ?? string.Empty,
-                    Payment = reader["payment"]?.ToString() ?? string.Empty,
-                    Link = reader["link"]?.ToString() ?? string.Empty,
-                    Url = reader["url"]?.ToString() ?? string.Empty,
-                    SymbolName = ShowSymbolName,
-                    SymbolCode = ShowSymbolCode
-
-                };
-                SampleItems.Add(job);
             }
         }
+        if (SampleItems.Any())
+        {
+            UpdateSampleItems(newItems);
+        }
+        else
+        {
+            foreach (var newItem in newItems)
+            {
+                SampleItems.Add(newItem);
+            }
+        }
+    }
+
+    private void UpdateSampleItems(List<Job> newItems)
+    {
+        var existingTitles = new HashSet<string>(SampleItems.Select(x => x.Title));
+
+        foreach (var newItem in newItems)
+        {
+            if (!existingTitles.Contains(newItem.Title))
+            {
+                SampleItems.Insert(0, newItem); // Prepend new item to the collection
+                existingTitles.Add(newItem.Title); // Add to set for future checks
+            }
+        }
+    }
+
+
+
+    public void OnNavigatedFrom()
+    {
+        App.DataRefreshed -= OnDataRefreshed;  // Unsubscribe when the view model is not visible
+    }
+
+    public async void OnNavigatedTo(object parameter)
+    {
+        LoadData();
     }
 
     public void EnsureItemSelected()
