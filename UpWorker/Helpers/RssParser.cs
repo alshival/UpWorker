@@ -60,6 +60,7 @@ public class RssParser
 
     public static Job FromRssItem(SyndicationItem item)
     {
+        var title = Regex.Replace(item.Title.Text,"- Upwork$",string.Empty);
         // Correctly extracting the first link as a string
         var link = item.Links.FirstOrDefault()?.Uri.ToString() ?? "";
         var description = item.Summary?.Text ?? "";
@@ -97,7 +98,7 @@ public class RssParser
 
         return new Job
         {
-            Title = item.Title.Text ?? "",
+            Title = title ?? "",
             Category = category,
             JobDescription = jobdescription,
             PostedOn = formattedPostedOn,
